@@ -4,28 +4,19 @@
         <div class="search_input">
             <div class="search_input_wrapper">
                 <i class="iconfont icon-sousuo"></i>
-                <input type="text">
+                <input type="text" v-model="message" >
             </div>					
         </div>
         <div class="search_result">
             <h3>电影/电视剧/综艺</h3>
             <ul>
-                <li>
-                    <div class="img"><img src="/images/movie_1.jpg"></div>
+                <li v-for="item in moviesList" :key="item.id">
+                    <div class="img"><img :src="item.img | setWH('128.180')"></div>
                     <div class="info">
-                        <p><span>无名之辈</span><span>8.5</span></p>
-                        <p>A Cool Fish</p>
-                        <p>剧情,喜剧,犯罪</p>
-                        <p>2018-11-16</p>
-                    </div>
-                </li>
-                <li>
-                    <div class="img"><img src="/images/movie_1.jpg"></div>
-                    <div class="info">
-                        <p><span>无名之辈</span><span>8.5</span></p>
-                        <p>A Cool Fish</p>
-                        <p>剧情,喜剧,犯罪</p>
-                        <p>2018-11-16</p>
+                        <p><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
+                        <p>{{item.enm}}</p>
+                        <p>{{item.cat}}</p>
+                        <p>{{item.rt}}</p>
                     </div>
                 </li>
             </ul>
@@ -35,7 +26,57 @@
 
 <script>
     export default {
-        name:'Search' 
+        name:'Search',
+        data(){
+            return {
+                message: '',
+                moviesList: []
+            }
+        },
+        methods : {
+            cancelRequest(){
+                if(typeof this.source === 'function'){
+                    this.source('终止请求')
+                }
+            }
+        },
+        watch : {
+            message(newVal) {
+                // 监听的属性和此方法的名字一致
+                // 进行数据请求操作
+                // clearTimeout()
+                // setTimeout() // 方法1、将请求放入延迟定时器中 快速输入的时候 就会先清除延迟定时器中的请求 重新开始新的延迟定时器中的请求
+                // 方法2、ajax也有此种防止多次触发的操作如abort()
+                // 方法3、axios也有自带的方法 百度查找axio终止多次请求
+                // 放到axios.get()中的第二个参数{}的形式
+
+                var that = this;
+                this.cancelRequest();
+
+                console.log(newVal);
+                this.$axios.get('/ajax/search?kw='+newVal+'&cityId=51&stype=-1'
+                ,{
+                    cancelToken : new this.$axios.CancelToken((c) => {
+                        that.source = c;
+                    })
+                }
+                ).then(res => {
+                    // 函数防抖策略
+                    // 快速输入的时候让最后一次触发 使用延迟定时器
+                    var movies = res.data.movies.list;
+                    if(movies) {
+                        this.moviesList = res.data.movies.list;
+                    }
+                }).catch( e => {
+                    console.log(e);
+                    if(this.axios.isCancel(e)){
+                        console.log(e.message);
+                    } else {
+                        console.log(e);
+                    }
+                })
+            }
+        }
     }
 
 </script>
