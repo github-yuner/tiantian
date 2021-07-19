@@ -9,7 +9,8 @@
         </div>
         <div class="search_result">
             <h3>电影/电视剧/综艺</h3>
-            <ul>
+            <Loading v-if="isLoading"></Loading>
+            <ul v-else>
                 <li v-for="item in moviesList" :key="item.id">
                     <div class="img"><img :src="item.img | setWH('128.180')"></div>
                     <div class="info">
@@ -30,7 +31,8 @@
         data(){
             return {
                 message: '',
-                moviesList: []
+                moviesList: [],
+                isLoading : false
             }
         },
         methods : {
@@ -40,7 +42,7 @@
                 }
             }
         },
-        watch : {
+        watch : { // 能够监听data中的数据的变化 需要绑定 到标签/元素上
             message(newVal) {
                 // 监听的属性和此方法的名字一致
                 // 进行数据请求操作
@@ -52,9 +54,9 @@
 
                 var that = this;
                 this.cancelRequest();
-
-                console.log(newVal);
-                this.$axios.get('/ajax/search?kw='+newVal+'&cityId=51&stype=-1'
+                var cityId = this.$store.state.city.id; // 这里只需要城市id，不需要判断城市变化，因为关键词变化都会引起数据请求
+                if(newVal) {this.isLoading = true;} // 打开加载
+                this.$axios.get('/ajax/search?kw='+newVal+'&cityId='+cityId+'&stype=-1'
                 ,{
                     cancelToken : new this.$axios.CancelToken((c) => {
                         that.source = c;
@@ -66,10 +68,11 @@
                     var movies = res.data.movies.list;
                     if(movies) {
                         this.moviesList = res.data.movies.list;
+                        this.isLoading = false;
                     }
                 }).catch( e => {
                     console.log(e);
-                    if(this.axios.isCancel(e)){
+                    if(this.$axios.isCancel(e)){
                         console.log(e.message);
                     } else {
                         console.log(e);

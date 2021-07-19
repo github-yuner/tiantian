@@ -4,12 +4,19 @@ img{ display: block;}
 html,body{ height:100%;}
 .clearfix:after{ content:""; display: block; clear:both;}
 
-#main{ height: 100%; display: flex; flex-direction:column;}
+#main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
 #content {
     flex: 1;
+    /* 占下剩余的空间 header部分是50px
+    footer部分给定高 固定定位 */
     overflow: auto;
-    margin: 50px 0;
+    margin-bottom: 50px;
     position: relative;
     display: flex;
     flex-direction: column;
 }
+

@@ -10,6 +10,10 @@ module.exports= {  // 模块化写法
                 target: 'https://m.maoyan.com/',
                 changeOrigin : true
             },
+            '/locate': {
+                target: 'http://i.meituan.com/',
+                changeOrigin : true
+            },
             // '/apollo': {
             //     target: 'https://m.maoyan.com/',
             //     changeOrigin : true
