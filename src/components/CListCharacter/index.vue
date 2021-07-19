@@ -1,25 +1,27 @@
 <!--  -->
 <template>
    <div class="cinema_body">
-        <ul>
-            <li v-for="item in cinemaList" :key="item.id">
-                <div>
-                    <span>{{item.nm}}</span>
-                    <span class="q"><span class="price">{{item.price}}</span> 元起</span>
-                </div>
-                <div class="address">
-                    <span>{{item.addr}}</span>
-                    <span>{{item.distance}}</span>
-                </div>
-                <div class="card">
-                    <div v-if="item.allowRefound != ''" class="bl">{{item.allowRefound}}</div>
-                    <div v-if="item.endorse != ''" class="bl">{{item.endorse}}</div>
-                    <div v-if="item.vipTag != ''">{{item.vipTag}}</div>
-                    <div v-if="item.hallType != ''">{{item.hallType}}</div>
-                </div>
-            </li>
-            
-        </ul>
+       <Loading v-if="isLoading"></Loading>
+       <Scroller v-else>
+            <ul>
+                <li v-for="item in cinemaList" :key="item.id">
+                    <div>
+                        <span>{{item.nm}}</span>
+                        <span class="q"><span class="price">{{item.price}}</span> 元起</span>
+                    </div>
+                    <div class="address">
+                        <span>{{item.addr}}</span>
+                        <span>{{item.distance}}</span>
+                    </div>
+                    <div class="card">
+                        <div v-if="item.allowRefound != ''" class="bl">{{item.allowRefound}}</div>
+                        <div v-if="item.endorse != ''" class="bl">{{item.endorse}}</div>
+                        <div v-if="item.vipTag != ''">{{item.vipTag}}</div>
+                        <div v-if="item.hallType != ''">{{item.hallType}}</div>
+                    </div>
+                </li>
+            </ul>
+        </Scroller>
     </div>
 </template>
 
@@ -28,11 +30,16 @@
         name:'CLisCharacter',
         data(){
             return {
-                cinemaList : []
+                cinemaList : [],
+                isLoading : true,
+                preCityId : -1
             }
         },
-        mounted(){
-            this.$axios.get('/ajax/moreCinemas')
+        activated() {
+            var cityId = this.$store.state.city.id;
+            if(this.preCityId == cityId) {return; }
+            this.isLoading = true;
+            this.$axios.get("/ajax/moreCinemas?cityId="+cityId)
             .then(res => {
                 var content = res.data.replace(/\s/ig, '');
                 var list = [];
@@ -65,6 +72,7 @@
                     list.push({id: i, nm, price, addr, distance, allowRefound, endorse, vipTag, hallType})
                 }
                 this.cinemaList = list;
+                this.isLoading = false;
 
             }).catch(e => {
                 console.log(e);
