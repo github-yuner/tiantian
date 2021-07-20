@@ -12,9 +12,9 @@
             <Loading v-if="isLoading"></Loading>
             <ul v-else>
                 <li v-for="item in moviesList" :key="item.id">
-                    <div class="img"><img :src="item.img | setWH('128.180')"></div>
+                    <div class="img"><img :src="item.img | setWH('128.180')" @touchstart="handleToDetail(item.id)"></div>
                     <div class="info">
-                        <p><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
+                        <p @touchstart="handleToDetail(item.id)" ><span>{{item.nm}}</span><span>{{item.sc}}</span></p>
                         <p>{{item.enm}}</p>
                         <p>{{item.cat}}</p>
                         <p>{{item.rt}}</p>
@@ -36,6 +36,9 @@
             }
         },
         methods : {
+            handleToDetail(movieId){
+                this.$router.push('/movie/detail/3/'+movieId)
+            },
             cancelRequest(){
                 if(typeof this.source === 'function'){
                     this.source('终止请求')
@@ -67,6 +70,7 @@
                     // 快速输入的时候让最后一次触发 使用延迟定时器
                     var movies = res.data.movies.list;
                     if(movies) {
+                        
                         this.moviesList = res.data.movies.list;
                         this.isLoading = false;
                     }
