@@ -6,9 +6,9 @@
             <ul >
                 <li class="pull_down">{{pullDownMsg}}</li>
                 <li v-for="item in comingList" :key="item.id">
-                    <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+                    <div class="pic_show"><img :src="item.img | setWH('128.180')" @touchstart="handleToDetail(item.id)"></div>
                     <div class="info_list">
-                        <h2>{{item.nm}}</h2>
+                        <h2 @touchstart="handleToDetail(item.id)" >{{item.nm}}</h2>
                         <p><span class="person">{{item.wish}}</span> 人想看</p>
                         <p>主演: {{item.star}}</p>
                         <p>{{item.rt}}上映</p>
@@ -48,6 +48,10 @@
             })
         },
         methods : {
+            handleToDetail(movieId){
+                // this.$router.push('movie/detail/'+movieId);
+                this.$router.push('/movie/detail/2/'+movieId);
+            },
             handleToScroll(pos){
                 // pos是一个表示位置的对象 有x和y两个参数
                 if(pos.y > 30) {
